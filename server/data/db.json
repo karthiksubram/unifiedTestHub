@@ -1,0 +1,285 @@
+{
+  "tasks": [
+    {
+      "id": "task-db-dev1",
+      "type": "DB_REFRESH",
+      "name": "My DB Refresh",
+      "description": "Refresh the DEV1 test database before daily testing",
+      "category": "Database",
+      "color": "purple",
+      "enabled": true,
+      "config": {
+        "database": "dev1",
+        "schema": "TEST",
+        "refreshMode": "Full"
+      },
+      "createdAt": "24 Aug 2026"
+    },
+    {
+      "id": "task-db-uat",
+      "type": "DB_REFRESH",
+      "name": "UAT Customer DB Refresh",
+      "description": "Refresh customer data in the UAT database",
+      "category": "Database",
+      "color": "purple",
+      "enabled": true,
+      "config": {
+        "database": "uat1",
+        "schema": "CUSTOMER",
+        "refreshMode": "Selective"
+      },
+      "createdAt": "23 Aug 2026"
+    },
+    {
+      "id": "task-autosys-eod",
+      "type": "AUTOSYS",
+      "name": "Customer EOD Load",
+      "description": "Run the customer end-of-day Autosys job",
+      "category": "Scheduling",
+      "color": "green",
+      "enabled": true,
+      "config": {
+        "jobName": "CUSTOMER_EOD_LOAD"
+      },
+      "createdAt": "22 Aug 2026"
+    },
+    {
+      "id": "task-manual-validate",
+      "type": "MANUAL",
+      "name": "Validate Trade Data",
+      "description": "Tester validates trade records after the load completes",
+      "category": "Human Action",
+      "color": "blue",
+      "enabled": true,
+      "config": {
+        "instruction": "Validate 10 sample trades and confirm quantities and prices"
+      },
+      "createdAt": "21 Aug 2026"
+    },
+    {
+      "id": "task-api-reset",
+      "type": "API",
+      "name": "Reset Test Customer API",
+      "description": "Reset customer test data through the test API",
+      "category": "Integration",
+      "color": "orange",
+      "enabled": true,
+      "config": {
+        "method": "POST",
+        "endpoint": "/api/test-data/customer/reset"
+      },
+      "createdAt": "20 Aug 2026"
+    },
+    {
+      "id": "task-sql-count",
+      "type": "SQL",
+      "name": "Customer Count Check",
+      "description": "Verify that the expected customer records are present",
+      "category": "Database",
+      "color": "slate",
+      "enabled": true,
+      "config": {
+        "query": "select count(*) from customer"
+      },
+      "createdAt": "19 Aug 2026"
+    },
+    {
+      "id": "task-file-input",
+      "type": "FILE",
+      "name": "Load Trade Input File",
+      "description": "Place the prepared trade input file into the test folder",
+      "category": "File Operations",
+      "color": "pink",
+      "enabled": true,
+      "config": {
+        "sourcePath": "/test/input/trades.csv",
+        "targetPath": "/test/dropzone/trades.csv"
+      },
+      "createdAt": "18 Aug 2026"
+    },
+    {
+      "id": "task-validation-customer",
+      "type": "VALIDATION",
+      "name": "Customer Data Validation",
+      "description": "Validate customer records after the database refresh",
+      "category": "Quality",
+      "color": "cyan",
+      "enabled": true,
+      "config": {
+        "rule": "CUSTOMER_COUNT > 0 AND ACTIVE_COUNT > 0"
+      },
+      "createdAt": "18 Aug 2026"
+    }
+  ],
+  "workflows": [
+    {
+      "id": "wf-daily-test",
+      "name": "Daily Test Setup",
+      "description": "Prepare the daily test environment",
+      "nodes": [
+        {
+          "id": "n1",
+          "type": "task",
+          "position": {
+            "x": 100,
+            "y": 180
+          },
+          "data": {
+            "label": "My DB Refresh",
+            "taskType": "DB_REFRESH",
+            "taskId": "task-db-dev1",
+            "configSummary": "database: dev1 \u00b7 schema: TEST"
+          }
+        },
+        {
+          "id": "n2",
+          "type": "task",
+          "position": {
+            "x": 380,
+            "y": 180
+          },
+          "data": {
+            "label": "Customer EOD Load",
+            "taskType": "AUTOSYS",
+            "taskId": "task-autosys-eod",
+            "configSummary": "jobName: CUSTOMER_EOD_LOAD"
+          }
+        },
+        {
+          "id": "n3",
+          "type": "task",
+          "position": {
+            "x": 660,
+            "y": 180
+          },
+          "data": {
+            "label": "Customer Data Validation",
+            "taskType": "VALIDATION",
+            "taskId": "task-validation-customer",
+            "configSummary": "rule: CUSTOMER_COUNT > 0 AND ACTIVE_COUNT > 0"
+          }
+        }
+      ],
+      "edges": [
+        {
+          "id": "e1",
+          "source": "n1",
+          "target": "n2",
+          "animated": true
+        },
+        {
+          "id": "e2",
+          "source": "n2",
+          "target": "n3",
+          "animated": true
+        }
+      ],
+      "status": "SUCCESS",
+      "taskCount": 3,
+      "modifiedAt": "18 Aug 2026",
+      "lastRun": "10:30 AM"
+    },
+    {
+      "id": "wf-customer-eod",
+      "name": "Customer EOD Test",
+      "description": "Customer end-of-day regression preparation",
+      "nodes": [],
+      "edges": [],
+      "status": "SUCCESS",
+      "taskCount": 8,
+      "modifiedAt": "17 Aug 2026",
+      "lastRun": "Yesterday"
+    },
+    {
+      "id": "wf-trade-validation",
+      "name": "Trade Validation",
+      "description": "Validate trade data after load",
+      "nodes": [],
+      "edges": [],
+      "status": "FAILED",
+      "taskCount": 4,
+      "modifiedAt": "16 Aug 2026",
+      "lastRun": "08:00 AM"
+    },
+    {
+      "id": "wf-db-regression",
+      "name": "DB Regression Test",
+      "description": "Regression database preparation",
+      "nodes": [],
+      "edges": [],
+      "status": "SUCCESS",
+      "taskCount": 6,
+      "modifiedAt": "15 Aug 2026",
+      "lastRun": "07:00 AM"
+    },
+    {
+      "id": "wf-reference",
+      "name": "Reference Data Load",
+      "description": "Load reference data for testing",
+      "nodes": [],
+      "edges": [],
+      "status": "SUCCESS",
+      "taskCount": 3,
+      "modifiedAt": "14 Aug 2026",
+      "lastRun": "2 days ago"
+    }
+  ],
+  "executions": [
+    {
+      "id": "ex1",
+      "name": "Refresh_Sales_DB",
+      "type": "DB Refresh",
+      "workflow": "Daily Test Setup",
+      "status": "SUCCESS",
+      "startedAt": "18 Aug 2026 10:30 AM",
+      "duration": "00:04:32"
+    },
+    {
+      "id": "ex2",
+      "name": "Load_Customer",
+      "type": "Autosys Task",
+      "workflow": "Customer EOD Test",
+      "status": "SUCCESS",
+      "startedAt": "18 Aug 2026 10:25 AM",
+      "duration": "00:06:18"
+    },
+    {
+      "id": "ex3",
+      "name": "Data_Validation",
+      "type": "Manual Task",
+      "workflow": "Trade Validation",
+      "status": "SUCCESS",
+      "startedAt": "18 Aug 2026 10:22 AM",
+      "duration": "00:01:45"
+    },
+    {
+      "id": "ex4",
+      "name": "Daily_Test_Setup",
+      "type": "Workflow",
+      "workflow": "Daily Test Setup",
+      "status": "SUCCESS",
+      "startedAt": "18 Aug 2026 09:00 AM",
+      "duration": "00:12:40"
+    },
+    {
+      "id": "ex5",
+      "name": "Refresh_Fin_DB",
+      "type": "DB Refresh",
+      "workflow": "DB Regression Test",
+      "status": "FAILED",
+      "startedAt": "18 Aug 2026 08:45 AM",
+      "duration": "00:03:12"
+    },
+    {
+      "id": "ex6",
+      "name": "API_Reference",
+      "type": "API Task",
+      "workflow": "Reference Data Load",
+      "status": "RUNNING",
+      "startedAt": "18 Aug 2026 08:40 AM",
+      "duration": "00:02:10"
+    }
+  ],
+  "auditLogs": [],
+  "notifications": []
+}
