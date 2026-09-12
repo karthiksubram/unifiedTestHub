@@ -1,0 +1,18 @@
+Role & Goal: You are an expert frontend engineer. Help me update my UTH application's login handler (http://localhost:3000) so it correctly redirects to PingFederate when launched inside an <iframe> / microfrontend environment within a VS Code Webview.
+
+The Issue:
+When UTH is opened directly in a Webview, the login redirect works fine. However, when UTH is launched from our Microfrontend host app, UTH is rendered inside a nested <iframe>. Clicking the "Login" button causes a blank screen because PingFederate sends X-Frame-Options: SAMEORIGIN / CSP frame-ancestors headers, which Chromium/VS Code blocks when rendered inside a nested sub-frame.
+
+Required Fix:
+
+Locate my login trigger / button click handler in this file.
+
+Add a check to detect if UTH is running inside an iframe context (window.self !== window.top).
+
+If running inside an iframe, navigate the root Webview window (window.top.location.href) to the PingFederate authorization URL instead of window.location.href.
+
+If running as a top-level window, perform standard navigation.
+
+Make sure to preserve all existing OAuth query parameters, state, and redirect_uri configs.
+
+Please refactor my login function to implement this top-frame breakout logic cleanly.
